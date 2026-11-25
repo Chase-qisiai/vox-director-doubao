@@ -8,12 +8,26 @@ description: >
   / rom1trs / Higgsfield 式拼贴广告工作流,或用户提到 拼贴动效视频 / 剪贴簿视频 / 拼贴广告 /
   motion collage。触发词:「vox video」「collage video」「拼贴视频」「拼贴动效」「剪贴簿」
   「paper collage explainer」「做个拼贴广告」「把这个主题做成拼贴视频」。
+  豆包工作 Agent 适配版:作为 Vox 拼贴创作补充工作流,与宿主的内置图像、视频及媒体处理能力配合使用。
 ---
 
 # Vox Director(中文版)
 
 把一句话主题变成一条成品 **Vox 纸片拼贴视频**:大胆、有冲击力、带旁白的讲解/广告片,每一段都是
-一张会动的撕纸拼贴海报,配旁白、配乐、字幕。全程只需**一个 Atlas Cloud API key** + 本地 **ffmpeg**。
+一张会动的撕纸拼贴海报,配旁白、配乐、字幕。独立运行模式只需**一个 Atlas Cloud API key** + 本地 **ffmpeg**。
+
+## 豆包工作 Agent 适配说明(先读)
+
+本文件提供 **Vox 创作与管线层**,不替代豆包内置工作流。执行图像、视频或媒体处理前,加载对应的宿主内置 Skill;本文与宿主当前规则不一致时,一律以宿主规则为准。
+
+- **显式选择后端。** 只有用户选择 Atlas Cloud,且所需 key、模型、参数与外部费用已纳入宿主生成确认时,才运行下面的 Atlas 脚本。否则使用豆包原生生成路径,复用相同的分镜与提示词。缺少 Atlas key 只阻塞 Atlas 路线,可改走原生路线或手动 prompt 包,不终止整个任务。
+- **统一授权。** 下文的分镜、主题、画幅近似与 Host 成本检查都作为宿主正常生成确认的规划输入,不再额外增加强制审批轮次;生成授权前完成全部提示词与参数。
+- **生成由宿主托管。** 豆包中每次调用 Atlas 脚本都添加前缀 `VOX_DIRECTOR_DOUBAO=1`。这会关闭任务自动重提及 A-roll 自动切换备选模型。批次、执行与失败处理遵循宿主规则;下文所有重试、重抽、自动回退和质量检查说明仅用于独立运行模式。用户要求修改时,按宿主授权创建新修订,不自动修复。
+- **产物放在用户项目中。** 将 `SKILL_DIR` 解析为本文件所在目录的绝对路径,将 `PROJECT_DIR` 解析为当前主项目下的绝对目录(通常为 `<主项目>/out/<project>`)。不要使用脚本默认写到 Skill 安装目录内的 `out/`。下文 `python3 scripts/keyframes.py out/<project>` 等示例均视为 `VOX_DIRECTOR_DOUBAO=1 python3 "$SKILL_DIR/scripts/keyframes.py" "$PROJECT_DIR"` 的简写,其余参数保持不变;每次新的 shell 调用都重新解析变量。
+- **正式后期走宿主批准链路。** 豆包中的合成、A-roll 音轨合流、字幕烧录、水印、绿幕及其他正式媒体处理,统一交给宿主批准的媒体处理工作流。除非宿主明确允许,不要用 `assemble.py`、`aroll_assemble.py` 或其他本地 ffmpeg 路径替代正式结果;这些脚本仍保留给独立运行或用户明确要求的本地预览。
+- **按宿主机制交付。** 每个成功生成的图片、视频片段与最终成片都通过豆包原生媒体交付机制展示,不只报告本地路径,也不把成功片段留到合成后才交付。第 7 步为肉眼检查而抽帧仅用于独立运行;豆包中只执行批准工作流所需的技术读取。
+
+下文其余内容保留原独立管线与创作默认值。
 
 风格 = Vox 讲解片和 Stav Zilber / rom1trs 带火的现代编辑感纸片拼贴:手撕纸边、胶带、半调网点、
 报纸剪报、每段一块大胆平涂色底、大号剪贴标题。
@@ -33,8 +47,11 @@ Vox 拼贴的**样子**和**动效**是两件事、两步:
 
 ## 前置检查(别跳过)
 
-- `echo "${ATLASCLOUD_API_KEY:+set}"` —— 空的话让用户去 https://www.atlascloud.ai/console/api-keys 拿 key 设上,没设就停。
-- `command -v ffmpeg ffprobe` —— 合成必需(macOS:`brew install ffmpeg`)。
+- `python3 -c "import os; print('set' if os.environ.get('ATLASCLOUD_API_KEY') else 'not set')"`
+  —— 仅 Atlas 路线需要,绝不打印 key 本身。为空时提示用户到 https://www.atlascloud.ai/console/api-keys
+  获取并配置,只停止 Atlas 路线。
+- `command -v ffmpeg ffprobe curl` —— 独立运行/本地预览脚本需要(macOS:`brew install ffmpeg`);
+  豆包正式后期按上方宿主路线执行。
 - `python3 -c "import PIL"` —— Pillow,用来烧字幕/水印。
 
 ## 标准流程(主题 → 成片)

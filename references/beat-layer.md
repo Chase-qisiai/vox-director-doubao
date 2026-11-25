@@ -5,10 +5,13 @@ The counterpart to `prompt-guide.md` (which covers the LOOK / theme layer). This
 camera move, element motion). Distilled from short-form/story-structure/editing research
 (sources at bottom). One "poster per beat"; our per-shot unit ≈ what the sources call a beat.
 
-Three tiers, three control methods (this is the design):
+Three tiers, three control methods (standalone design):
 - **Narrative arc** → preset menu, AI recommends from topic, **user confirms** (one click).
-- **Per-beat scene + headline** → AI drafts from the topic, **user approves/edits** (the one mandatory gate).
+- **Per-beat scene + headline** → AI drafts from the topic, **user approves/edits** (the standalone gate).
 - **Shot size + camera move** → **rule/preset-derived from arc position + anti-monotony**; AI fills from a *hard-constrained* vocab; user can override but rarely needs to. Never free-form (the model will emit "orbit"/"dolly-zoom" and break the flat art).
+
+In Doubao Work Agent, these choices are planning inputs to the host's normal generation
+confirmation, not additional approval rounds; the host's current interaction rules win.
 
 ---
 
@@ -85,8 +88,9 @@ Rule: **uniform translate + uniform scale = safe** (text scales/moves as one pie
 
 **Bold / experimental (available, NOT banned):** `orbit`/`arc`, `dolly_zoom`, `roll/dutch`,
 `whip`. Verified 2026-07-10 to *tend to* warp the flat art / smear text — but they're a **style
-choice, not forbidden**. Use them with **`constraints: loose`** and **re-roll** until a
-take lands; save them for a beat where the effect earns it. In `strict` mode the guards will
+choice, not forbidden**. In standalone mode, use them with **`constraints: loose`** and **re-roll** until a
+take lands; in Doubao, any revision follows the host's user-request and authorization rules instead.
+Save them for a beat where the effect earns it. In `strict` mode the guards will
 fight them (that's the point of the mode). `whip` also works well as a fast between-shot
 transition. If you just want a dolly-in's *feel* cleanly, a 2D `push_in` scales text as one
 piece and never warps.

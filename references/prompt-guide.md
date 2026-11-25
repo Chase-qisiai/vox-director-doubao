@@ -143,6 +143,8 @@ The motion prompt turns "pan a poster" into "a living collage". Use the **5-axis
   rather than asking one clip to do a complex timeline.
 
 ### The full axis vocabulary (the 5 axes above, expanded with the STABILITY axes)
+Re-roll notes in this reference describe standalone mode. In Doubao Work Agent, deliver results
+and handle user-requested revisions under the host's current rules rather than auto-re-rolling.
 The core 5 axes set mood and motion; the extra axes below (⭐⭐) are what actually control
 STABILITY — they fix the loop / text-wobble / morph failures. Pick phrasing per axis.
 

@@ -1,7 +1,7 @@
 {
-  "name": "vox-director",
-  "version": "1.0.0",
-  "description": "Vox Director — an open-source Agent Skill that turns one topic into a finished Vox-style paper-collage explainer/ad video: script, collage keyframes, motion, voice-over, music and captions, automated end to end on the Atlas Cloud API + local ffmpeg. Works with Claude Code, Codex, and any SKILL.md agent.",
+  "name": "vox-director-doubao",
+  "version": "1.0.1",
+  "description": "Vox Director — 豆包工作 Agent 适配版 / Doubao Work Agent adapted edition. Original Vox-style paper-collage video workflow with host-compatible authorization, execution, paths and delivery.",
   "keywords": [
     "vox",
     "vox-director",
@@ -14,6 +14,8 @@
     "explainer-video",
     "ai-ads",
     "agent-skill",
+    "doubao",
+    "doubao-work-agent",
     "claude-skill",
     "claude-code",
     "codex",
@@ -22,10 +24,10 @@
     "atlas-cloud",
     "generative-ai"
   ],
-  "homepage": "https://github.com/Alisa0808/vox-director",
+  "homepage": "https://github.com/Chase-qisiai/vox-director-doubao",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Alisa0808/vox-director.git"
+    "url": "https://github.com/Chase-qisiai/vox-director-doubao.git"
   },
   "license": "MIT",
   "author": "Alisa0808"

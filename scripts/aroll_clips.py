@@ -27,7 +27,7 @@ import os
 import subprocess
 import sys
 
-from provider import get_provider, run_jobs
+from provider import doubao_host_managed, get_provider, run_jobs
 from styles import resolve_theme, resolve_video_aspect
 
 PRIMARY_MODEL = "google/gemini-omni-flash/video-edit"
@@ -142,8 +142,9 @@ def run(project_dir, only=None):
 
     done = run_jobs(prov, specs, poll_s=8, stall_s=240, max_retries=1, deadline_s=900)
 
-    # ---- fallback pass: only the beats the primary model rejected/failed ----
-    retry_keys = [k for k, u in done.items() if not u]
+    # Standalone mode may retry failed beats on a fallback model. In Doubao mode,
+    # leave that decision and any new generation authorization to the host.
+    retry_keys = [] if doubao_host_managed() else [k for k, u in done.items() if not u]
     if retry_keys:
         a_fallback = gate_aspect(fallback)
         if a_fallback is None:
@@ -163,8 +164,11 @@ def run(project_dir, only=None):
     for key, url in done.items():
         beat = meta[key]["beat"]
         if not url:
-            print(f"[{key}] FAILED on both primary and fallback -- beat will be missing "
-                  f"from the assembled film")
+            if doubao_host_managed():
+                print(f"[{key}] FAILED on primary; automatic fallback is disabled in Doubao mode")
+            else:
+                print(f"[{key}] FAILED on both primary and fallback -- beat will be missing "
+                      f"from the assembled film")
             continue
         dest = os.path.join(clip_dir, f"clip_{key}.mp4")
         prov.download(url, dest)

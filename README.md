@@ -1,6 +1,8 @@
 <p align="right"><b>English</b> · <a href="README.zh.md">简体中文</a></p>
 
-# 🎬 Vox Director
+# 🎬 Vox Director · Doubao Work Agent Adapted Edition
+
+> Minimal compatibility adaptation of [Alisa0808/vox-director](https://github.com/Alisa0808/vox-director), preserving the original creative workflow, scripts, MIT license and attribution while adding Doubao host integration, managed execution, project paths and media delivery.
 
 **Turn one topic into a finished Vox-style paper-collage explainer / ad video — script, collage keyframes, motion, voice-over, music and captions, all automated.**
 
@@ -35,11 +37,27 @@ https://github.com/user-attachments/assets/ed08d230-7bcb-4b48-a17d-23c079208f9f
 
 ---
 
+## Scope of the Doubao adaptation
+
+This edition adds a compatibility layer without rewriting the creative engine. Standalone behavior remains unchanged; Doubao's current host rules take precedence for the corresponding operations.
+
+| Original conflict | Minimal adaptation |
+|---|---|
+| Self-contained workflow can duplicate host workflows | Use this Skill as the Vox creative/pipeline layer and load the applicable built-in capability first |
+| Separate beat, style and aspect approval rounds | Feed these decisions into the host's normal generation confirmation instead of adding approvals |
+| Automatic job resubmission and A-roll model fallback | Prefix Atlas scripts with `VOX_DIRECTOR_DOUBAO=1` to disable both automatic behaviors |
+| Default `out/` can land inside the installed Skill | Require absolute `PROJECT_DIR` under the main project and absolute `SKILL_DIR` |
+| Local ffmpeg assembly may not match the host's formal post-processing route | Route formal post-processing through the host; retain scripts for standalone use or an explicitly requested local preview |
+| Local-path-only output and automatic review/re-roll | Deliver images, clips and the final film through the host's native media mechanism; revisions are user-requested and re-authorized |
+| Hard-coded `/usr/bin/curl` | Resolve `curl` from `PATH` for portable macOS / Linux execution |
+
+See “Doubao Work Agent adaptation” at the top of [`SKILL.md`](SKILL.md), or [`SKILL.zh.md`](SKILL.zh.md) for the Chinese workflow.
+
 ## What it is
 
 The look is the modern editorial **paper-collage** popularized by Vox explainers: hand-cut paper cut-outs, torn edges, tape, halftone dots, newspaper clippings, bold flat color per beat, big cut-out headlines — brought to life with motion, a narrator, music and captions.
 
-## How it works
+## How it works (standalone)
 
 One topic flows through one script per stage, all driven by a single `beats.json` per project:
 
@@ -89,12 +107,14 @@ Model IDs drift — the skill fetches the live list from `GET https://api.atlasc
 
 This is an **agent skill** — it works with any coding agent that can read a workflow and run scripts (Claude Code, Codex, …). Claude Code auto-discovers it as a skill; other agents read [`AGENTS.md`](AGENTS.md) → [`SKILL.md`](SKILL.md).
 
-**Option A — from this repo:**
+**Option A — Doubao Work Agent:** copy this repository directory as `vox-director` inside the user Skill directory exposed by the active environment, then refresh/rediscover Skills using the host's normal mechanism. Do not hard-code a machine-specific Profile path. Ask for a Vox collage video; the host will combine its built-in capabilities with this Skill.
+
+**Option B — other coding agents:**
 ```bash
-git clone https://github.com/Alisa0808/vox-director.git ~/.claude/skills/vox-director
+git clone https://github.com/Chase-qisiai/vox-director-doubao.git ~/.claude/skills/vox-director
 ```
 
-**Option B — from the packaged skill:** download [`vox-director.skill`](vox-director.skill) and install it via your Claude skills UI.
+**Option C — packaged skill:** download [`vox-director.skill`](vox-director.skill) and install it through a Claude skills UI that supports this format.
 
 Then set your Atlas Cloud API key (get one at [atlascloud.ai/console/api-keys](https://www.atlascloud.ai/console/api-keys?utm_source=github&utm_campaign=vox_director)):
 ```bash

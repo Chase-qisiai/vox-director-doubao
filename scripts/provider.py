@@ -10,10 +10,16 @@ Pick a backend per project with beats.json `{"provider": "atlas_cloud"}` (defaul
 The layer is a thin in-process wrapper — zero extra network hops, so it does NOT
 slow the pipeline; the only cost is the API latency, which is unchanged.
 """
+import os
 import time
 from abc import ABC, abstractmethod
 
 import atlas_cloud
+
+
+def doubao_host_managed():
+    """Return True when Doubao owns generation authorization and retries."""
+    return os.environ.get("VOX_DIRECTOR_DOUBAO", "").lower() in {"1", "true", "yes"}
 
 
 class ProviderError(RuntimeError):
@@ -91,13 +97,17 @@ def get_provider(name=None):
 
 
 def run_jobs(prov, specs, *, poll_s=3, stall_s=90, max_retries=2, deadline_s=900):
-    """Submit + poll a batch of jobs, resubmitting any that FAIL or STALL.
+    """Submit + poll a batch of jobs, resubmitting failures in standalone mode.
 
     specs: dict of key -> submit() callable returning a job id. A job that fails,
     or stays pending past `stall_s`, is resubmitted (fresh id) up to `max_retries`
-    times — this is what stops one stuck prediction from wasting the whole deadline.
+    times — this stops one stuck prediction from wasting the whole deadline.
+    With VOX_DIRECTOR_DOUBAO=1, automatic resubmission is disabled so the host
+    retains control over generation authorization, failure handling and cost.
     Returns key -> output URL (or None). Prints progress like the old loops did.
     """
+    if doubao_host_managed():
+        max_retries = 0
     st = {}
     for key, submit in specs.items():
         st[key] = {"pid": submit(), "t": time.time(), "tries": 0}

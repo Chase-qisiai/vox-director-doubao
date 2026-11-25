@@ -17,6 +17,7 @@ Env: ATLASCLOUD_API_KEY must be set.
 """
 import json
 import os
+import shutil
 import subprocess
 import time
 import urllib.request
@@ -166,10 +167,18 @@ def video(model: str, prompt: str, **params) -> str:
 
 # ---------------------------------------------------------------- upload / dl
 
+def _curl() -> str:
+    """Resolve curl from PATH instead of assuming a platform-specific location."""
+    path = shutil.which("curl")
+    if not path:
+        raise AtlasCloudError("curl is required for Atlas Cloud upload/download")
+    return path
+
+
 def upload(file_path: str) -> str:
     """Upload a local file, return its public URL. Uses curl (multipart)."""
     out = subprocess.run(
-        ["/usr/bin/curl", "-s", "-X", "POST", f"{MEDIA_BASE}/model/uploadMedia",
+        [_curl(), "-s", "-X", "POST", f"{MEDIA_BASE}/model/uploadMedia",
          "-H", f"Authorization: Bearer {_key()}", "-H", f"User-Agent: {UA}",
          "-F", f"file=@{file_path}"],
         capture_output=True, text=True, check=True).stdout
@@ -182,7 +191,7 @@ def upload(file_path: str) -> str:
 
 def download(url: str, dest: str) -> str:
     """Proxy-safe download via curl (urllib breaks on the OSS host)."""
-    subprocess.run(["/usr/bin/curl", "-s", "--retry", "3", "-o", dest, url], check=True)
+    subprocess.run([_curl(), "-s", "--retry", "3", "-o", dest, url], check=True)
     if not os.path.exists(dest) or os.path.getsize(dest) == 0:
         raise AtlasCloudError(f"download produced empty file: {url}")
     return dest

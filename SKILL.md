@@ -1,26 +1,60 @@
 ---
 name: vox-director
 description: >
-  Turn ONE topic into a finished Vox-style paper-collage explainer / ad video, end to end
-  on the Atlas Cloud API + local ffmpeg — script, collage keyframes, motion, voice-over,
-  music, captions, all automated. Use this whenever the user wants a "Vox style" video,
-  a paper/torn-paper collage animation, a "motion collage", a narrated explainer or short
-  ad built from AI-generated collage posters, a scrapbook-style tribute, or wants to turn
-  a topic / product / person into a punchy narrated collage video — even if they don't say
-  the word "Vox". Also use when reproducing Stav Zilber / rom1trs / Higgsfield-style collage
-  ad workflows.
-  Three input modalities: a topic (B-roll), a talking-head video (A-roll mode), or a single
-  photo of a person/product anchored into the collage (C-roll mode).
-  Triggers: "vox video", "collage video", "motion collage", "paper collage
-  explainer", "make a collage ad", "turn this topic into a collage video", "turn my
-  photo/this product shot into a collage video".
+  Turn one topic into a finished Vox-style paper-collage explainer/ad on Atlas Cloud + local
+  ffmpeg: script, keyframes, motion, voice-over, music and captions. Use for Vox-style videos,
+  paper/torn-paper collage animation, motion collage, narrated collage explainers/ads,
+  scrapbook tributes, or turning a topic/product/person into a narrated collage video; also
+  for Stav Zilber / rom1trs / Higgsfield-style workflows. Inputs: topic (B-roll), talking-head
+  video (A-roll), one person/product photo (C-roll), or a presenter image (Host). Triggers:
+  "vox video", "collage video", "motion collage", "paper collage explainer", "make a collage
+  ad", "turn this topic/photo/product shot into a collage video", "拼贴视频", "拼贴动效".
+  Doubao Work Agent adapted edition: use with the host's built-in image/video/media workflows.
 ---
 
 # Vox Director
 
 Turn a one-line topic into a finished **Vox-style paper-collage video**: a bold, punchy,
 narrated explainer/ad where each beat is a torn-paper collage poster that comes alive, with
-voice-over, music and captions. Runs on **one Atlas Cloud API key** + local **ffmpeg**.
+voice-over, music and captions. Standalone mode runs on **one Atlas Cloud API key** + local
+**ffmpeg**.
+
+## Doubao Work Agent adaptation (read first)
+
+Use this file as the **Vox creative and pipeline layer**, not as a replacement for Doubao's
+built-in workflows. Load the applicable host image/video/media-processing Skill before the
+corresponding operation. If this file differs from current host rules, the host rules win.
+
+- **Choose the backend explicitly.** Use the Atlas scripts below only when the user selects
+  Atlas Cloud and the required key, models, parameters and external cost are covered by the
+  host's generation confirmation. Otherwise use Doubao's native generation route with the same
+  beat map and prompt guidance. A missing Atlas key blocks only the Atlas route; offer the
+  native route or the manual prompt-pack instead of stopping the whole task.
+- **Unify authorization.** Treat the beat map, theme choice, aspect approximation and host-cost
+  checks below as planning inputs to the host's normal confirmation, not as extra mandatory
+  approval rounds. Complete all prompts and parameters before generation authorization.
+- **Keep generation host-managed.** Prefix every Atlas script invocation in Doubao with
+  `VOX_DIRECTOR_DOUBAO=1`. This disables automatic job resubmission and A-roll's automatic
+  fallback model. Follow the host's batching, execution and failure rules; all retry, re-roll,
+  automatic-fallback and quality-review instructions below are standalone-only. A requested
+  change is a new host-authorized revision, not an automatic repair.
+- **Keep outputs in the user project.** Resolve `SKILL_DIR` to the absolute folder containing
+  this file and `PROJECT_DIR` to an absolute folder under the current main project directory
+  (normally `<main-project>/out/<project>`). Never use the scripts' default `out/` inside the
+  installed Skill. Every example such as `python3 scripts/keyframes.py out/<project>` is
+  shorthand for `VOX_DIRECTOR_DOUBAO=1 python3 "$SKILL_DIR/scripts/keyframes.py" "$PROJECT_DIR"`;
+  preserve any additional arguments. Resolve these variables afresh in each shell invocation.
+- **Use approved formal post-processing.** In Doubao, route assembly, A-roll remuxing, caption
+  burning, watermarking, green-screen work and other formal media processing through the host's
+  approved media-processing workflow. Do not substitute `assemble.py`, `aroll_assemble.py` or
+  another local ffmpeg path for a formal result unless the host explicitly permits it. Those
+  scripts remain available for standalone use or an explicitly requested local preview.
+- **Deliver through the host.** Deliver every generated image/video result and the final film
+  with Doubao's native media-delivery mechanism instead of reporting only a local path. Do not
+  hold back successful clips until assembly. Step 7's frame extraction for visual inspection is
+  standalone-only; in Doubao, perform only the technical reads needed by the approved workflow.
+
+The remaining instructions describe the original standalone pipeline and its creative defaults.
 
 The look is the modern editorial paper-collage popularized by Vox explainers and creators
 like Stav Zilber / rom1trs: hand-cut paper cut-outs, torn edges, tape, halftone dots,
@@ -44,9 +78,11 @@ between "a real Vox collage" and "a moving PowerPoint".
 
 ## Prerequisites (check, don't skip)
 
-- `echo "${ATLASCLOUD_API_KEY:+set}"` — if empty, tell the user to set it (get one at
-  https://www.atlascloud.ai/console/api-keys) and stop.
-- `command -v ffmpeg ffprobe` — required for assembly (`brew install ffmpeg` on macOS).
+- `python3 -c "import os; print('set' if os.environ.get('ATLASCLOUD_API_KEY') else 'not set')"`
+  — required only for the Atlas route; never print the key itself. If empty, tell the user to
+  set it (get one at https://www.atlascloud.ai/console/api-keys) and stop only that route.
+- `command -v ffmpeg ffprobe curl` — required by the standalone/local-preview scripts
+  (`brew install ffmpeg` on macOS). Formal Doubao post-processing uses the host route above.
 - `python3 -c "import PIL"` — Pillow, for captions/watermark overlays.
 
 ## Standard workflow (topic → film)

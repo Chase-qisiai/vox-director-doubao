@@ -1,6 +1,8 @@
 <p align="right"><a href="README.md">English</a> · <b>简体中文</b></p>
 
-# 🎬 Vox Director(拼贴动效导演)
+# 🎬 Vox Director（拼贴动效导演）· 豆包适配版
+
+> 基于 [Alisa0808/vox-director](https://github.com/Alisa0808/vox-director) 的最小化适配，保留原创作流程、脚本与 MIT 许可；新增豆包工作 Agent 的规则衔接、宿主托管开关、项目路径及交付兼容。
 
 **一个选题进,一条成片出——脚本、拼贴关键帧、动效、旁白、配乐、字幕,全流程自动化的 Vox 风格拼贴讲解/广告视频。**
 
@@ -35,11 +37,27 @@ https://github.com/user-attachments/assets/ed08d230-7bcb-4b48-a17d-23c079208f9f
 
 ---
 
+## 豆包适配范围
+
+本版只做兼容层，不重写原创作引擎。原版独立运行方式保持不变；豆包中由宿主当前规则接管对应环节。
+
+| 原冲突点 | 最小化适配 |
+|---|---|
+| Skill 自带完整流程，可能与宿主规则重复 | 本 Skill 仅提供 Vox 创作与管线层，对应操作先走宿主内置能力，宿主规则优先 |
+| 分镜、风格、画幅等多轮独立确认 | 合并为宿主正常生成确认所需的规划输入，不额外增设审批 |
+| 失败自动重提、A-roll 自动换模型 | 每次 Atlas 脚本调用加 `VOX_DIRECTOR_DOUBAO=1`，关闭这两类自动行为 |
+| 默认 `out/` 可能写进 Skill 安装目录 | 强制使用主项目下的绝对 `PROJECT_DIR` 与 Skill 绝对 `SKILL_DIR` |
+| 本地 ffmpeg 合成与宿主正式后期链路不一致 | 正式后期交给宿主批准的媒体处理流程；原脚本保留给独立运行或明确要求的本地预览 |
+| 只返回本地文件、成功后自动审片重抽 | 图片、片段和成片按宿主原生媒体机制交付；修改由用户发起并重新授权 |
+| 写死 `/usr/bin/curl` | 改为从 `PATH` 动态查找 `curl`，兼容 macOS / Linux 的不同安装位置 |
+
+详细执行边界见 [`SKILL.md`](SKILL.md) 顶部的“Doubao Work Agent adaptation”；中文执行说明见 [`SKILL.zh.md`](SKILL.zh.md)。
+
 ## 这是什么
 
 风格是 Vox 讲解片带火的现代编辑感**纸质拼贴**:手撕纸片、毛边、胶带、半调网点、报纸剪贴、每一拍一块大胆平涂色、大号剪纸标题——再配上动效、旁白、配乐和字幕,让整张海报活过来。
 
-## 工作原理
+## 工作原理（独立运行）
 
 一个选题依次流过每个阶段一个脚本,全程由每个项目一份 `beats.json` 驱动:
 
@@ -89,12 +107,14 @@ https://github.com/user-attachments/assets/ed08d230-7bcb-4b48-a17d-23c079208f9f
 
 这是一个**通用 agent 技能**——任何能读工作流、跑脚本的编码 agent 都能用(Claude Code、Codex 等)。Claude Code 会自动把它识别成 skill;其他 agent 读 [`AGENTS.md`](AGENTS.md) → [`SKILL.md`](SKILL.md)。
 
-**方式 A —— 从本仓库:**
+**方式 A —— 豆包工作 Agent:** 将本仓库目录复制为当前环境用户 Skill 目录下的 `vox-director` 文件夹，按宿主方式刷新/重新发现 Skills。不要写死某个本机 Profile 路径。安装后直接提出 Vox 拼贴视频需求，宿主会结合内置能力与本 Skill 执行。
+
+**方式 B —— 其他编码 Agent:**
 ```bash
-git clone https://github.com/Alisa0808/vox-director.git ~/.claude/skills/vox-director
+git clone https://github.com/Chase-qisiai/vox-director-doubao.git ~/.claude/skills/vox-director
 ```
 
-**方式 B —— 用打包好的技能文件:** 下载 [`vox-director.skill`](vox-director.skill),在你的 Claude 技能界面里安装。
+**方式 C —— 用打包好的技能文件:** 下载 [`vox-director.skill`](vox-director.skill),在支持该格式的 Claude 技能界面里安装。
 
 然后设置 Atlas Cloud API key(在 [atlascloud.ai/console/api-keys](https://www.atlascloud.ai/console/api-keys?utm_source=github&utm_campaign=vox_director) 获取):
 ```bash
