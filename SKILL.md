@@ -1,8 +1,8 @@
 ---
 name: vox-director
 description: >
-  Turn one topic into a finished Vox-style paper-collage explainer/ad on Atlas Cloud + local
-  ffmpeg: script, keyframes, motion, voice-over, music and captions. Use for Vox-style videos,
+  Turn one topic into a finished Vox-style paper-collage explainer/ad with Doubao-native
+  image/video/audio by default; standalone Atlas Cloud + ffmpeg is optional. Use for Vox videos,
   paper/torn-paper collage animation, motion collage, narrated collage explainers/ads,
   scrapbook tributes, or turning a topic/product/person into a narrated collage video; also
   for Stav Zilber / rom1trs / Higgsfield-style workflows. Inputs: topic (B-roll), talking-head
@@ -25,11 +25,12 @@ Use this file as the **Vox creative and pipeline layer**, not as a replacement f
 built-in workflows. Load the applicable host image/video/media-processing Skill before the
 corresponding operation. If this file differs from current host rules, the host rules win.
 
-- **Choose the backend explicitly.** Use the Atlas scripts below only when the user selects
-  Atlas Cloud and the required key, models, parameters and external cost are covered by the
-  host's generation confirmation. Otherwise use Doubao's native generation route with the same
-  beat map and prompt guidance. A missing Atlas key blocks only the Atlas route; offer the
-  native route or the manual prompt-pack instead of stopping the whole task.
+- **Use Doubao native generation by default.** Do not ask for an Atlas key and do not run the
+  Atlas scripts for a normal Doubao request. Reuse the beat map and prompt guidance with the
+  host's native image, video and audio capabilities. Use Atlas only when the user explicitly
+  selects that external backend for the current task, with its key, models, parameters and
+  external cost covered by the host's generation confirmation. If Atlas is requested but its
+  key is missing, stop only that optional route and offer the native route or prompt-pack.
 - **Unify authorization.** Treat the beat map, theme choice, aspect approximation and host-cost
   checks below as planning inputs to the host's normal confirmation, not as extra mandatory
   approval rounds. Complete all prompts and parameters before generation authorization.
@@ -76,7 +77,9 @@ Everything hinges on the prompts. **Before writing any image or video prompt, re
 `references/prompt-guide.md`** — it has the exact prompt structures that make the difference
 between "a real Vox collage" and "a moving PowerPoint".
 
-## Prerequisites (check, don't skip)
+## Standalone prerequisites (Atlas route only)
+
+Skip this section for the default Doubao-native route; use the host's current capability checks.
 
 - `python3 -c "import os; print('set' if os.environ.get('ATLASCLOUD_API_KEY') else 'not set')"`
   — required only for the Atlas route; never print the key itself. If empty, tell the user to

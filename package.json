@@ -1,7 +1,7 @@
 {
   "name": "vox-director-doubao",
-  "version": "1.0.1",
-  "description": "Vox Director — 豆包工作 Agent 适配版 / Doubao Work Agent adapted edition. Original Vox-style paper-collage video workflow with host-compatible authorization, execution, paths and delivery.",
+  "version": "1.0.2",
+  "description": "Vox Director — 豆包工作 Agent 适配版 / Doubao Work Agent adapted edition. Doubao-native image, video and audio generation by default; optional standalone Atlas Cloud pipeline.",
   "keywords": [
     "vox",
     "vox-director",

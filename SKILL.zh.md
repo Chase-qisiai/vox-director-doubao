@@ -1,8 +1,8 @@
 ---
 name: vox-director
 description: >
-  把一个主题一句话变成成品的 Vox 纸片拼贴讲解/广告视频,全程 Atlas Cloud API + 本地 ffmpeg
-  ——脚本、拼贴关键帧、动效、旁白、配乐、字幕全自动。当用户想做「Vox 风格」视频、纸片/撕纸拼贴
+  把一个主题一句话变成成品的 Vox 纸片拼贴讲解/广告视频,豆包默认使用原生图片/视频/音频能力,
+  独立运行可选 Atlas Cloud API + 本地 ffmpeg——脚本、拼贴关键帧、动效、旁白、配乐、字幕全自动。当用户想做「Vox 风格」视频、纸片/撕纸拼贴
   动画、「motion collage」、用 AI 生成的拼贴海报做旁白讲解或短广告、剪贴簿式致敬片,或想把一个
   主题/产品/人物变成有冲击力的旁白拼贴视频时使用——即使没说「Vox」也用。也用于复刻 Stav Zilber
   / rom1trs / Higgsfield 式拼贴广告工作流,或用户提到 拼贴动效视频 / 剪贴簿视频 / 拼贴广告 /
@@ -20,7 +20,7 @@ description: >
 
 本文件提供 **Vox 创作与管线层**,不替代豆包内置工作流。执行图像、视频或媒体处理前,加载对应的宿主内置 Skill;本文与宿主当前规则不一致时,一律以宿主规则为准。
 
-- **显式选择后端。** 只有用户选择 Atlas Cloud,且所需 key、模型、参数与外部费用已纳入宿主生成确认时,才运行下面的 Atlas 脚本。否则使用豆包原生生成路径,复用相同的分镜与提示词。缺少 Atlas key 只阻塞 Atlas 路线,可改走原生路线或手动 prompt 包,不终止整个任务。
+- **默认使用豆包原生生成。** 普通豆包请求不询问 Atlas key,也不运行 Atlas 脚本;分镜与提示词直接复用到宿主原生的图片、视频和音频能力。只有用户当前任务明确选择 Atlas 外部后端,且所需 key、模型、参数与外部费用已纳入宿主生成确认时,才使用 Atlas。用户选择 Atlas 但缺少 key 时,只停止该可选路线,并提供原生路线或手动 prompt 包。
 - **统一授权。** 下文的分镜、主题、画幅近似与 Host 成本检查都作为宿主正常生成确认的规划输入,不再额外增加强制审批轮次;生成授权前完成全部提示词与参数。
 - **生成由宿主托管。** 豆包中每次调用 Atlas 脚本都添加前缀 `VOX_DIRECTOR_DOUBAO=1`。这会关闭任务自动重提及 A-roll 自动切换备选模型。批次、执行与失败处理遵循宿主规则;下文所有重试、重抽、自动回退和质量检查说明仅用于独立运行模式。用户要求修改时,按宿主授权创建新修订,不自动修复。
 - **产物放在用户项目中。** 将 `SKILL_DIR` 解析为本文件所在目录的绝对路径,将 `PROJECT_DIR` 解析为当前主项目下的绝对目录(通常为 `<主项目>/out/<project>`)。不要使用脚本默认写到 Skill 安装目录内的 `out/`。下文 `python3 scripts/keyframes.py out/<project>` 等示例均视为 `VOX_DIRECTOR_DOUBAO=1 python3 "$SKILL_DIR/scripts/keyframes.py" "$PROJECT_DIR"` 的简写,其余参数保持不变;每次新的 shell 调用都重新解析变量。
@@ -45,7 +45,9 @@ Vox 拼贴的**样子**和**动效**是两件事、两步:
 「真·Vox 拼贴」和「会动的 PPT」区分开的精确 prompt 结构。两个"库"文件:`prompt-guide.md`(画面/LOOK
 层:生图5段 + 生视频轴 + 词库 + 8 套主题预置)、`beat-layer.md`(故事/STORY 层:叙事弧库 + 运镜/素材运动)。
 
-## 前置检查(别跳过)
+## 独立运行前置检查(仅 Atlas 路线)
+
+默认豆包原生路线跳过本节,按宿主当前能力检查执行。
 
 - `python3 -c "import os; print('set' if os.environ.get('ATLASCLOUD_API_KEY') else 'not set')"`
   —— 仅 Atlas 路线需要,绝不打印 key 本身。为空时提示用户到 https://www.atlascloud.ai/console/api-keys

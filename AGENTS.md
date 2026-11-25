@@ -12,9 +12,11 @@ Doubao Work Agent compatibility layer.
 2. Load the applicable built-in host Skill before image generation, video
    generation or media processing. This repository supplies the Vox creative
    layer; current host rules control authorization, execution and delivery.
-3. Use Atlas scripts only for an explicitly selected Atlas Cloud backend. Prefix
-   every invocation with `VOX_DIRECTOR_DOUBAO=1` so automatic resubmission and
-   A-roll model fallback stay disabled.
+3. Default to Doubao's native image, video and audio generation; no Atlas key is
+   needed. Run Atlas scripts only when the user explicitly selects that external
+   backend for the current task. In that optional case, prefix every invocation
+   with `VOX_DIRECTOR_DOUBAO=1` so automatic resubmission and A-roll model
+   fallback stay disabled.
 4. Always pass an absolute project directory under the user's main project. Do
    not rely on the scripts' default `out/` inside the installed Skill.
 5. Route formal post-processing and all media delivery through the host. The

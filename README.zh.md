@@ -2,11 +2,11 @@
 
 # 🎬 Vox Director（拼贴动效导演）· 豆包适配版
 
-> 基于 [Alisa0808/vox-director](https://github.com/Alisa0808/vox-director) 的最小化适配，保留原创作流程、脚本与 MIT 许可；新增豆包工作 Agent 的规则衔接、宿主托管开关、项目路径及交付兼容。
+> 基于 [Alisa0808/vox-director](https://github.com/Alisa0808/vox-director) 的最小化适配，保留原创作流程、脚本与 MIT 许可。**豆包中默认使用原生图片、视频、音频生成能力，无需 Atlas Cloud key**；Atlas 仅保留给明确选择该外部后端的任务或独立运行模式。
 
 **一个选题进,一条成片出——脚本、拼贴关键帧、动效、旁白、配乐、字幕,全流程自动化的 Vox 风格拼贴讲解/广告视频。**
 
-一个**通用 agent 技能**,后端全跑 [Atlas Cloud](https://www.atlascloud.ai/?utm_source=github&utm_campaign=vox_director) API、本地用 `ffmpeg` 合成,任何编码 agent(Claude Code、Codex 等)都能用。你给一句话选题,它给你一个 `mp4`。
+一个**通用 agent 技能**。豆包适配版默认使用豆包原生图片、视频、音频生成能力；原版独立管线使用 [Atlas Cloud](https://www.atlascloud.ai/?utm_source=github&utm_campaign=vox_director) API 和本地 `ffmpeg`。你给一句话选题,它给你一个 `mp4`。
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-black.svg) ![Powered by Atlas Cloud](https://img.shields.io/badge/powered%20by-Atlas%20Cloud-ff5a1f.svg) ![Agent Skill](https://img.shields.io/badge/Agent-Skill-d97757.svg)
 
@@ -43,6 +43,7 @@ https://github.com/user-attachments/assets/ed08d230-7bcb-4b48-a17d-23c079208f9f
 
 | 原冲突点 | 最小化适配 |
 |---|---|
+| Atlas Cloud 看似是必填依赖 | **豆包默认走原生图片、视频、音频生成，不检查也不需要 Atlas key**；只有明确选择外部 Atlas 后端才启用对应脚本 |
 | Skill 自带完整流程，可能与宿主规则重复 | 本 Skill 仅提供 Vox 创作与管线层，对应操作先走宿主内置能力，宿主规则优先 |
 | 分镜、风格、画幅等多轮独立确认 | 合并为宿主正常生成确认所需的规划输入，不额外增设审批 |
 | 失败自动重提、A-roll 自动换模型 | 每次 Atlas 脚本调用加 `VOX_DIRECTOR_DOUBAO=1`，关闭这两类自动行为 |
@@ -116,7 +117,7 @@ git clone https://github.com/Chase-qisiai/vox-director-doubao.git ~/.claude/skil
 
 **方式 C —— 用打包好的技能文件:** 下载 [`vox-director.skill`](vox-director.skill),在支持该格式的 Claude 技能界面里安装。
 
-然后设置 Atlas Cloud API key(在 [atlascloud.ai/console/api-keys](https://www.atlascloud.ai/console/api-keys?utm_source=github&utm_campaign=vox_director) 获取):
+**豆包原生路线直接跳过本步，不需要 Atlas key。** 只有明确选择 Atlas 外部后端或使用原版独立管线时，才设置 Atlas Cloud API key(在 [atlascloud.ai/console/api-keys](https://www.atlascloud.ai/console/api-keys?utm_source=github&utm_campaign=vox_director) 获取):
 ```bash
 export ATLASCLOUD_API_KEY="sk-..."
 ```
@@ -131,8 +132,9 @@ agent 会先起草分镜脚本给你确认,再跑一轮风格试片让你挑,然
 
 ## 环境要求
 
+- 豆包原生路线:**无需 Atlas Cloud key**,使用宿主提供的图片、视频、音频生成与媒体处理能力
 - 一个**编码 agent**——Claude Code、Codex 或类似工具
-- **Atlas Cloud** API key
+- **Atlas Cloud** API key(仅明确选择 Atlas 外部后端或独立运行时需要)
 - **ffmpeg** + **ffprobe**(`brew install ffmpeg`)
 - **Python 3** + **Pillow**(`pip install pillow`)——用于字幕/水印叠加
 

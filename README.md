@@ -2,11 +2,11 @@
 
 # 🎬 Vox Director · Doubao Work Agent Adapted Edition
 
-> Minimal compatibility adaptation of [Alisa0808/vox-director](https://github.com/Alisa0808/vox-director), preserving the original creative workflow, scripts, MIT license and attribution while adding Doubao host integration, managed execution, project paths and media delivery.
+> Minimal compatibility adaptation of [Alisa0808/vox-director](https://github.com/Alisa0808/vox-director), preserving the original creative workflow, scripts, MIT license and attribution. **Doubao defaults to native image, video and audio generation with no Atlas Cloud key required**; Atlas remains optional for an explicitly selected external backend or standalone mode.
 
 **Turn one topic into a finished Vox-style paper-collage explainer / ad video — script, collage keyframes, motion, voice-over, music and captions, all automated.**
 
-An **agent skill** that runs end to end on the [Atlas Cloud](https://www.atlascloud.ai/?utm_source=github&utm_campaign=vox_director) API + local `ffmpeg`, usable by any coding agent (Claude Code, Codex, etc.). You give it a one-line topic; it gives you an `mp4`.
+An **agent skill** with Doubao-native image, video and audio generation by default. The original standalone pipeline uses the [Atlas Cloud](https://www.atlascloud.ai/?utm_source=github&utm_campaign=vox_director) API + local `ffmpeg`. You give it a one-line topic; it gives you an `mp4`.
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-black.svg) ![Powered by Atlas Cloud](https://img.shields.io/badge/powered%20by-Atlas%20Cloud-ff5a1f.svg) ![Agent Skill](https://img.shields.io/badge/Agent-Skill-d97757.svg)
 
@@ -43,6 +43,7 @@ This edition adds a compatibility layer without rewriting the creative engine. S
 
 | Original conflict | Minimal adaptation |
 |---|---|
+| Atlas Cloud appears mandatory | **Doubao defaults to native image, video and audio generation with no Atlas key check**; Atlas scripts run only for an explicitly selected external backend |
 | Self-contained workflow can duplicate host workflows | Use this Skill as the Vox creative/pipeline layer and load the applicable built-in capability first |
 | Separate beat, style and aspect approval rounds | Feed these decisions into the host's normal generation confirmation instead of adding approvals |
 | Automatic job resubmission and A-roll model fallback | Prefix Atlas scripts with `VOX_DIRECTOR_DOUBAO=1` to disable both automatic behaviors |
@@ -116,7 +117,7 @@ git clone https://github.com/Chase-qisiai/vox-director-doubao.git ~/.claude/skil
 
 **Option C — packaged skill:** download [`vox-director.skill`](vox-director.skill) and install it through a Claude skills UI that supports this format.
 
-Then set your Atlas Cloud API key (get one at [atlascloud.ai/console/api-keys](https://www.atlascloud.ai/console/api-keys?utm_source=github&utm_campaign=vox_director)):
+**Skip this step for the default Doubao-native route; no Atlas key is needed.** Only set an Atlas Cloud API key when explicitly using that external backend or the original standalone pipeline (get one at [atlascloud.ai/console/api-keys](https://www.atlascloud.ai/console/api-keys?utm_source=github&utm_campaign=vox_director)):
 ```bash
 export ATLASCLOUD_API_KEY="sk-..."
 ```
@@ -131,8 +132,9 @@ The agent will draft a beat map for your approval, run a style bake-off for you 
 
 ## Requirements
 
+- Doubao-native route: **no Atlas Cloud key**, using the host's native image, video, audio and media-processing capabilities
 - A **coding agent** — Claude Code, Codex, or similar
-- **Atlas Cloud** API key
+- **Atlas Cloud** API key (only for an explicitly selected Atlas backend or standalone mode)
 - **ffmpeg** + **ffprobe** (`brew install ffmpeg`)
 - **Python 3** with **Pillow** (`pip install pillow`) — for caption/watermark overlays
 
